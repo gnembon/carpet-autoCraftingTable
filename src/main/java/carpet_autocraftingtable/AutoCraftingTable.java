@@ -8,6 +8,7 @@ public class AutoCraftingTable implements CarpetExtension
     public static void noop() { }
     static
     {
+        CraftingTableBlockEntity.init();
         CarpetServer.manageExtension(new AutoCraftingTable());
     }
 
