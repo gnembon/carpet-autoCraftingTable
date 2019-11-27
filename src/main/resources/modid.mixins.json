@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "carpet_autocraftingtable.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MinecraftServer_noopMixin",
+    "CraftingInventoryMixin",
+    "CraftingTableBlockMixin"
+  ],
+  "client": [
+    "MinecraftClient_noopMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

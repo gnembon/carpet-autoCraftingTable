@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "carpet-autocraftingtable",
+  "version": "1.2.4",
+
+  "name": "Auto-Crafting Table mod for carpet-mod",
+  "description": "Auto-Crafting Table mod for carpet-mod originally by Skyrising",
+  "authors": [
+    "Skyrising, gnembon"
+  ],
+  "contact": {
+    "homepage": "https://web.me/",
+    "sources": "https://github.com/gnembon/carpet-autoCraftingTable"
+  },
+
+  "license": "GNU LGPL V3",
+  "icon": "assets/modid/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+    ]
+  },
+  "mixins": [
+    "modid.mixins.json"
+  ],
+
+  "depends": {
+    "minecraft": "1.14.x",
+    "fabricloader": ">=0.4.0",
+    "carpet": "*"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}
