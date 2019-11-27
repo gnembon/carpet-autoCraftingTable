@@ -40,17 +40,17 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
         return AutoCraftingTableSettings.autoCraftingTable ? new CraftingTableBlockEntity() : null;
     }
 
-    @Inject(method = "activate", at = @At("HEAD"), cancellable = true)
-    private void onActivate(BlockState blockState, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
+    private void onActivateActionResult(BlockState blockState_1, World world_1, BlockPos blockPos_1, PlayerEntity playerEntity_1, Hand hand_1, BlockHitResult blockHitResult_1, CallbackInfoReturnable<ActionResult> cir) {
         if (!hasBlockEntity()) return;
-        if (!world.isClient) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (!world_1.isClient) {
+            BlockEntity blockEntity = world_1.getBlockEntity(blockPos_1);
             if (blockEntity instanceof CraftingTableBlockEntity) {
-                player.openContainer((NameableContainerProvider) blockEntity);
+                playerEntity_1.openContainer((NameableContainerProvider) blockEntity);
             }
         }
-        player.incrementStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
-        cir.setReturnValue(true);
+        playerEntity_1.incrementStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
+        cir.setReturnValue(ActionResult.SUCCESS);
         cir.cancel();
     }
 
