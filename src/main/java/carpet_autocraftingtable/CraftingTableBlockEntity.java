@@ -27,7 +27,7 @@ import java.util.Optional;
 public class CraftingTableBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider
 {
     public static final BlockEntityType<CraftingTableBlockEntity> TYPE = Registry.register(
-            Registry.BLOCK_ENTITY,
+            Registry.BLOCK_ENTITY_TYPE,
             "carpet:crafting_table",
             BlockEntityType.Builder.create(CraftingTableBlockEntity::new, Blocks.CRAFTING_TABLE).build(null)
     );

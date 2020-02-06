@@ -1,6 +1,6 @@
 package carpet_autocraftingtable;
 
-import net.minecraft.client.network.packet.GuiSlotUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.ContainerSlotUpdateS2CPacket;
 import net.minecraft.container.CraftingTableContainer;
 import net.minecraft.container.Slot;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,7 +18,7 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
         super(id, playerInventory);
         this.blockEntity = blockEntity;
         this.player = playerInventory.player;
-        slotList.clear();
+        slots.clear();
         this.addSlot(new OutputSlot(this.blockEntity));
 
         for(int y = 0; y < 3; ++y) {
@@ -42,7 +42,7 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
     public void onContentChanged(Inventory inv) {
         if (this.player instanceof ServerPlayerEntity) {
             ServerPlayNetworkHandler netHandler = ((ServerPlayerEntity) this.player).networkHandler;
-            netHandler.sendPacket(new GuiSlotUpdateS2CPacket(this.syncId, 0, this.blockEntity.getInvStack(0)));
+            netHandler.sendPacket(new ContainerSlotUpdateS2CPacket(this.syncId, 0, this.blockEntity.getInvStack(0)));
         }
     }
 

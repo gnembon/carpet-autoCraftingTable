@@ -6,7 +6,7 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.container.NameableContainerProvider;
+import net.minecraft.container.NameableContainerFactory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -46,7 +46,7 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
         if (!world_1.isClient) {
             BlockEntity blockEntity = world_1.getBlockEntity(blockPos_1);
             if (blockEntity instanceof CraftingTableBlockEntity) {
-                playerEntity_1.openContainer((NameableContainerProvider) blockEntity);
+                playerEntity_1.openContainer((NameableContainerFactory) blockEntity);
             }
         }
         playerEntity_1.incrementStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
