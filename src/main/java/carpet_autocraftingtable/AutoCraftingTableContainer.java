@@ -110,5 +110,12 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
                 ((RecipeUnlocker)this.inventory).unlockLastRecipe(this.player);
             }
         }
+
+        @Override
+        public ItemStack onTakeItem(PlayerEntity player, ItemStack stack)
+        {
+            onCrafted(stack, stack.getCount());
+            return super.onTakeItem(player, stack);
+        }
     }
 }
