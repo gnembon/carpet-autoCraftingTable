@@ -35,6 +35,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     private static final int[] INPUT_SLOTS = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     public DefaultedList<ItemStack> inventory;
     public ItemStack output = ItemStack.EMPTY;
+    private Recipe<?> lastRecipe;
     private List<AutoCraftingTableContainer> openContainers = new ArrayList<>();
 
     public CraftingTableBlockEntity() {  //this(BlockEntityType.BARREL);
@@ -171,12 +172,12 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     public void setLastRecipe(Recipe<?> var1) {
-
+        lastRecipe = var1;
     }
 
     @Override
     public Recipe<?> getLastRecipe() {
-        return null;
+        return lastRecipe;
     }
 
     @Override
@@ -186,7 +187,9 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     private Optional<CraftingRecipe> getCurrentRecipe() {
         if (this.world == null) return Optional.empty();
-        return this.world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+        Optional<CraftingRecipe> optionalRecipe = this.world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+        optionalRecipe.ifPresent(this::setLastRecipe);
+        return optionalRecipe;
     }
 
     private ItemStack craft() {
