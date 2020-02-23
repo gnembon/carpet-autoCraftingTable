@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -19,7 +20,7 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
         this.blockEntity = blockEntity;
         this.player = playerInventory.player;
         slots.clear();
-        this.addSlot(new OutputSlot(this.blockEntity));
+        this.addSlot(new OutputSlot(this.blockEntity, this.player));
 
         for(int y = 0; y < 3; ++y) {
             for(int x = 0; x < 3; ++x) {
@@ -55,6 +56,16 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
                 return ItemStack.EMPTY;
             }
             this.blockEntity.takeInvStack(0, before.getCount() - current.getCount());
+
+            if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null)
+            {
+                // this sets recipe in container
+                if (!blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe()))
+                {
+                    return ItemStack.EMPTY;
+                }
+            }
+            slots.get(0).onStackChanged(current, before); // calls onCrafted if different
             return this.blockEntity.getInvStack(0);
         }
         return super.transferSlot(player, slot);
@@ -70,8 +81,10 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
     }
 
     private class OutputSlot extends Slot {
-        OutputSlot(Inventory inv) {
+        private PlayerEntity player;
+        OutputSlot(Inventory inv, PlayerEntity player) {
             super(inv, 0, 124, 35);
+            this.player = player;
         }
 
         @Override
@@ -82,6 +95,20 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
         @Override
         protected void onTake(int amount) {
             AutoCraftingTableContainer.this.blockEntity.takeInvStack(0, amount);
+        }
+
+        @Override
+        protected void onCrafted(ItemStack stack, int amount)
+        {
+            super.onCrafted(stack);
+            // from CraftingResultsSlot onCrafted
+            if (amount > 0) {
+                stack.onCraft(this.player.world, this.player, amount);
+            }
+
+            if (this.inventory instanceof RecipeUnlocker) {
+                ((RecipeUnlocker)this.inventory).unlockLastRecipe(this.player);
+            }
         }
     }
 }
