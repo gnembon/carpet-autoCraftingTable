@@ -1,8 +1,8 @@
 package carpet_autocraftingtable;
 
-import net.minecraft.network.packet.s2c.play.ContainerSlotUpdateS2CPacket;
-import net.minecraft.container.CraftingTableContainer;
-import net.minecraft.container.Slot;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.minecraft.screen.CraftingScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -11,7 +11,7 @@ import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
-public class AutoCraftingTableContainer extends CraftingTableContainer {
+public class AutoCraftingTableContainer extends CraftingScreenHandler {
     private final CraftingTableBlockEntity blockEntity;
     private final PlayerEntity player;
 
@@ -43,19 +43,19 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
     public void onContentChanged(Inventory inv) {
         if (this.player instanceof ServerPlayerEntity) {
             ServerPlayNetworkHandler netHandler = ((ServerPlayerEntity) this.player).networkHandler;
-            netHandler.sendPacket(new ContainerSlotUpdateS2CPacket(this.syncId, 0, this.blockEntity.getInvStack(0)));
+            netHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(this.syncId, 0, this.blockEntity.getStack(0)));
         }
     }
 
     @Override
     public ItemStack transferSlot(PlayerEntity player, int slot) {
         if (slot == 0) {
-            ItemStack before = this.blockEntity.getInvStack(0).copy();
+            ItemStack before = this.blockEntity.getStack(0).copy();
             ItemStack current = before.copy();
             if (!this.insertItem(current, 10, 46, true)) {
                 return ItemStack.EMPTY;
             }
-            this.blockEntity.takeInvStack(0, before.getCount() - current.getCount());
+            this.blockEntity.removeStack(0, before.getCount() - current.getCount());
 
             if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null)
             {
@@ -66,7 +66,7 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
                 }
             }
             slots.get(0).onStackChanged(current, before); // calls onCrafted if different
-            return this.blockEntity.getInvStack(0);
+            return this.blockEntity.getStack(0);
         }
         return super.transferSlot(player, slot);
     }
@@ -94,7 +94,7 @@ public class AutoCraftingTableContainer extends CraftingTableContainer {
 
         @Override
         protected void onTake(int amount) {
-            AutoCraftingTableContainer.this.blockEntity.takeInvStack(0, amount);
+            AutoCraftingTableContainer.this.blockEntity.removeStack(0, amount);
         }
 
         @Override

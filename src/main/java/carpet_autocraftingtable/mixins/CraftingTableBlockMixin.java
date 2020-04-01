@@ -1,12 +1,13 @@
 package carpet_autocraftingtable.mixins;
 
+import carpet.CarpetSettings;
 import carpet_autocraftingtable.AutoCraftingTableSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.container.NameableContainerFactory;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -29,10 +30,10 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
         super(block$Settings_1);
     }
 
-    @Override
+    /*@Override is final
     public boolean hasBlockEntity() {
         return AutoCraftingTableSettings.autoCraftingTable;
-    }
+    }*/
 
     @Override
     public BlockEntity createBlockEntity(BlockView var1)
@@ -42,11 +43,13 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
 
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
     private void onActivateActionResult(BlockState blockState_1, World world_1, BlockPos blockPos_1, PlayerEntity playerEntity_1, Hand hand_1, BlockHitResult blockHitResult_1, CallbackInfoReturnable<ActionResult> cir) {
+        CarpetSettings.LOG.error("boo");
         if (!hasBlockEntity()) return;
+        CarpetSettings.LOG.error("foo");
         if (!world_1.isClient) {
             BlockEntity blockEntity = world_1.getBlockEntity(blockPos_1);
             if (blockEntity instanceof CraftingTableBlockEntity) {
-                playerEntity_1.openContainer((NameableContainerFactory) blockEntity);
+                playerEntity_1.openHandledScreen((NamedScreenHandlerFactory) blockEntity);
             }
         }
         playerEntity_1.incrementStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
@@ -84,7 +87,7 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
                 if (!craftingTableBlockEntity.output.isEmpty()) {
                     ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), craftingTableBlockEntity.output);
                 }
-                world.updateHorizontalAdjacent(pos, this);
+                world.updateNeighborsAlways(pos, this);
             }
             world.removeBlockEntity(pos);
 
