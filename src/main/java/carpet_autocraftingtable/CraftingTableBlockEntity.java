@@ -79,7 +79,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     }
 
     @Override
-    protected ScreenHandler createContainer(int id, PlayerInventory playerInventory) {
+    protected ScreenHandler createScreenHandler(int id, PlayerInventory playerInventory) {
         AutoCraftingTableContainer container = new AutoCraftingTableContainer(id, playerInventory, this);
         this.openContainers.add(container);
         return container;

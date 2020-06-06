@@ -77,8 +77,9 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
         return 0;
     }
 
+
     @Override
-    public void onBlockRemoved(BlockState state1, World world, BlockPos pos, BlockState state2, boolean boolean_1) {
+    public void onStateReplaced(BlockState state1, World world, BlockPos pos, BlockState state2, boolean boolean_1) {
         if (state1.getBlock() != state2.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
             if (blockEntity instanceof CraftingTableBlockEntity) {
@@ -91,7 +92,7 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
             }
             world.removeBlockEntity(pos);
 
-            super.onBlockRemoved(state1, world, pos, state2, boolean_1);
+            super.onStateReplaced(state1, world, pos, state2, boolean_1);
         }
     }
 }

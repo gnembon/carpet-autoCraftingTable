@@ -3,13 +3,13 @@
   "package": "carpet_autocraftingtable.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MinecraftServer_noopMixin",
+    "Main_serverNoopMixin",
     "CraftingInventoryMixin",
     "CraftingTableBlockMixin",
     "AbstractBlockMixin"
   ],
   "client": [
-    "MinecraftClient_noopMixin"
+    "Main_clientNoopMixin"
   ],
   "injectors": {
     "defaultRequire": 1
