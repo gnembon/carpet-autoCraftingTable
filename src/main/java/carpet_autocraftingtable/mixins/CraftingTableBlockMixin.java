@@ -42,10 +42,9 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
     }
 
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
-    private void onActivateActionResult(BlockState blockState_1, World world_1, BlockPos blockPos_1, PlayerEntity playerEntity_1, Hand hand_1, BlockHitResult blockHitResult_1, CallbackInfoReturnable<ActionResult> cir) {
-        CarpetSettings.LOG.error("boo");
+    private void onActivateActionResult(BlockState blockState_1, World world_1, BlockPos blockPos_1, PlayerEntity playerEntity_1, Hand hand_1, BlockHitResult blockHitResult_1, CallbackInfoReturnable<ActionResult> cir)
+    {
         if (!hasBlockEntity()) return;
-        CarpetSettings.LOG.error("foo");
         if (!world_1.isClient) {
             BlockEntity blockEntity = world_1.getBlockEntity(blockPos_1);
             if (blockEntity instanceof CraftingTableBlockEntity) {
