@@ -36,15 +36,16 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
     }*/
 
     @Override
-    public BlockEntity createBlockEntity(BlockView var1)
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state)
     {
-        return AutoCraftingTableSettings.autoCraftingTable ? new CraftingTableBlockEntity() : null;
+        return AutoCraftingTableSettings.autoCraftingTable ? new CraftingTableBlockEntity(pos, state) : null;
     }
 
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
     private void onActivateActionResult(BlockState blockState_1, World world_1, BlockPos blockPos_1, PlayerEntity playerEntity_1, Hand hand_1, BlockHitResult blockHitResult_1, CallbackInfoReturnable<ActionResult> cir)
     {
-        if (!hasBlockEntity()) return;
+        if (!AutoCraftingTableSettings.autoCraftingTable) return;
+        if (!blockState_1.hasBlockEntity()) return;
         if (!world_1.isClient) {
             BlockEntity blockEntity = world_1.getBlockEntity(blockPos_1);
             if (blockEntity instanceof CraftingTableBlockEntity) {
@@ -58,12 +59,13 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
 
     @Override
     public boolean hasComparatorOutput(BlockState blockState) {
-        return hasBlockEntity();
+        return AutoCraftingTableSettings.autoCraftingTable && blockState.hasBlockEntity();
     }
 
     @Override
     public int getComparatorOutput(BlockState blockState, World world, BlockPos pos) {
-        if (!hasBlockEntity()) return 0;
+        if (!AutoCraftingTableSettings.autoCraftingTable) return 0;
+        if (!blockState.hasBlockEntity()) return 0;
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof CraftingTableBlockEntity) {
             CraftingTableBlockEntity craftingTableBlockEntity = (CraftingTableBlockEntity) blockEntity;

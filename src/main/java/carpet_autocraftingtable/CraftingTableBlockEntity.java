@@ -23,6 +23,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 
@@ -42,19 +43,15 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     public DefaultedList<ItemStack> inventory;
     public ItemStack output = ItemStack.EMPTY;
     private Recipe<?> lastRecipe;
-    private List<AutoCraftingTableContainer> openContainers = new ArrayList<>();
+    private final List<AutoCraftingTableContainer> openContainers = new ArrayList<>();
 
-    public CraftingTableBlockEntity() {  //this(BlockEntityType.BARREL);
-        this(TYPE);
-    }
-
-    private CraftingInventory craftingInventory = new CraftingInventory(null, 3, 3);
-
-    private CraftingTableBlockEntity(BlockEntityType<?> type) {
-        super(type);
+    public CraftingTableBlockEntity(BlockPos pos, BlockState state) {  //this(BlockEntityType.BARREL);
+        super(TYPE, pos, state);
         this.inventory = DefaultedList.ofSize(9, ItemStack.EMPTY);
         ((CraftingInventoryMixin) craftingInventory).setInventory(this.inventory);
     }
+
+    private final CraftingInventory craftingInventory = new CraftingInventory(null, 3, 3);
 
     public static void init() { } // registers BE type
 
@@ -67,8 +64,8 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     }
 
     @Override
-    public void fromTag(BlockState state, CompoundTag tag) {
-        super.fromTag(state, tag);
+    public void fromTag(CompoundTag tag) {
+        super.fromTag(tag);
         Inventories.fromTag(tag, inventory);
         this.output = ItemStack.fromTag(tag.getCompound("Output"));
     }
