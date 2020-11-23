@@ -44,11 +44,15 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
     private void onActivateActionResult(BlockState blockState_1, World world_1, BlockPos blockPos_1, PlayerEntity playerEntity_1, Hand hand_1, BlockHitResult blockHitResult_1, CallbackInfoReturnable<ActionResult> cir)
     {
-        if (!hasBlockEntity()) return;
+        if (!AutoCraftingTableSettings.autoCraftingTable) return;
         if (!world_1.isClient) {
             BlockEntity blockEntity = world_1.getBlockEntity(blockPos_1);
             if (blockEntity instanceof CraftingTableBlockEntity) {
                 playerEntity_1.openHandledScreen((NamedScreenHandlerFactory) blockEntity);
+            }
+            else
+            {
+                return;
             }
         }
         playerEntity_1.incrementStat(Stats.INTERACT_WITH_CRAFTING_TABLE);
@@ -58,12 +62,12 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
 
     @Override
     public boolean hasComparatorOutput(BlockState blockState) {
-        return hasBlockEntity();
+        return AutoCraftingTableSettings.autoCraftingTable;
     }
 
     @Override
     public int getComparatorOutput(BlockState blockState, World world, BlockPos pos) {
-        if (!hasBlockEntity()) return 0;
+        if (!AutoCraftingTableSettings.autoCraftingTable) return 0;
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof CraftingTableBlockEntity) {
             CraftingTableBlockEntity craftingTableBlockEntity = (CraftingTableBlockEntity) blockEntity;
