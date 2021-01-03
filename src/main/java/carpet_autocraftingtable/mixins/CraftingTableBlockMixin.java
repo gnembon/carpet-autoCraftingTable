@@ -2,10 +2,7 @@ package carpet_autocraftingtable.mixins;
 
 import carpet.CarpetSettings;
 import carpet_autocraftingtable.AutoCraftingTableSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.CraftingTableBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,7 +35,7 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state)
     {
-        return AutoCraftingTableSettings.autoCraftingTable ? new CraftingTableBlockEntity(pos, state) : null;
+        return AutoCraftingTableSettings.autoCraftingTable ? (state.isOf(Blocks.CRAFTING_TABLE) ? new CraftingTableBlockEntity(pos, state) : null) : null;
     }
 
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
