@@ -2,7 +2,10 @@ package carpet_autocraftingtable.mixins;
 
 import carpet.CarpetSettings;
 import carpet_autocraftingtable.AutoCraftingTableSettings;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.CraftingTableBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.entity.player.PlayerEntity;
