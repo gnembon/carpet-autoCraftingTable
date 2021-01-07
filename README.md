@@ -1,2 +1,4 @@
-# carpet-autoCraftingTable
-autoCraftingTable extension for carpet-mod. Implementation based on Skyrising's implementation for autoCraftingTable for QuickCarpet - implemnted here as an extension for fabric-carpet mod.
+# Carpet AutoCraftingTable - Unofficial Fork
+
+### IF YOU WANT THE MOD, GO HERE: https://github.com/gnembon/carpet-autoCraftingTable
+THIS IS A FORK OF CARPET AUTOCRAFTINGTABLE FOR MY TESTING PURPOSES. DO NOT USE THIS FORK. I HAVE ABSOLUTELY NO IDEA WHAT I AM DOING SO DON'T LOOK TO ME.
