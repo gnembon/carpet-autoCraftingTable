@@ -118,4 +118,9 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
             super.onTakeItem(player, stack);
         }
     }
+
+   @Override
+   public boolean canUse(PlayerEntity player) {
+      return this.blockEntity.canPlayerUse(player);
+   }
 }
