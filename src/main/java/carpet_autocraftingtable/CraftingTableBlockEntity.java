@@ -50,6 +50,16 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     private CraftingInventory craftingInventory = new CraftingInventory(null, 3, 3);
 
+    public CraftingInventory setHandler(ScreenHandler handler) {
+        ((CraftingInventoryMixin) craftingInventory).setHandler(handler);
+        return craftingInventory;
+    }
+
+    public CraftingInventory unsetHandler() {
+        ((CraftingInventoryMixin) craftingInventory).setHandler(null);
+        return craftingInventory;
+    }
+
     private CraftingTableBlockEntity(BlockEntityType<?> type) {
         super(type);
         this.inventory = DefaultedList.ofSize(9, ItemStack.EMPTY);

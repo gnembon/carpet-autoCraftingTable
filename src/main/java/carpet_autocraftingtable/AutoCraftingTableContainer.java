@@ -1,24 +1,32 @@
 package carpet_autocraftingtable;
 
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
-import net.minecraft.screen.CraftingScreenHandler;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeUnlocker;
+import net.minecraft.screen.CraftingScreenHandler;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class AutoCraftingTableContainer extends CraftingScreenHandler {
     private final CraftingTableBlockEntity blockEntity;
     private final PlayerEntity player;
+    private CraftingInventory crafting_inv;
 
     AutoCraftingTableContainer(int id, PlayerInventory playerInventory, CraftingTableBlockEntity blockEntity) {
         super(id, playerInventory);
         this.blockEntity = blockEntity;
         this.player = playerInventory.player;
+
+        this.crafting_inv = blockEntity.setHandler(this);
+
         slots.clear();
         this.addSlot(new OutputSlot(this.blockEntity, this.player));
 
@@ -72,6 +80,7 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
     }
 
     public void close(PlayerEntity player) {
+        this.crafting_inv = blockEntity.unsetHandler();
         PlayerInventory playerInventory = player.inventory;
         if (!playerInventory.getCursorStack().isEmpty()) {
             player.dropItem(playerInventory.getCursorStack(), false);
@@ -118,4 +127,24 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
             return super.onTakeItem(player, stack);
         }
     }
+
+   public void populateRecipeFinder(RecipeFinder finder) {
+      this.crafting_inv.provideRecipeInputs(finder);
+   }
+
+   public void clearCraftingSlots() {
+      this.crafting_inv.clear();
+   }
+
+   public boolean matches(Recipe<? super CraftingInventory> recipe) {
+      return recipe.matches(this.crafting_inv, this.player.world);
+   }
+
+   public int getCraftingWidth() {
+      return this.crafting_inv.getWidth();
+   }
+
+   public int getCraftingHeight() {
+      return this.crafting_inv.getHeight();
+   }
 }
