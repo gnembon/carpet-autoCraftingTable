@@ -25,7 +25,7 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
         this.blockEntity = blockEntity;
         this.player = playerInventory.player;
 
-        this.crafting_inv = blockEntity.setHandler(this);
+        this.crafting_inv = blockEntity.boundCraftingInventory(this);
 
         slots.clear();
         this.addSlot(new OutputSlot(this.blockEntity, this.player));
@@ -51,6 +51,7 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
     public void onContentChanged(Inventory inv) {
         if (this.player instanceof ServerPlayerEntity) {
             ServerPlayNetworkHandler netHandler = ((ServerPlayerEntity) this.player).networkHandler;
+            netHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(this.syncId, 0, this.blockEntity.getStack(1)));
             netHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(this.syncId, 0, this.blockEntity.getStack(0)));
         }
     }
@@ -80,7 +81,7 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
     }
 
     public void close(PlayerEntity player) {
-        this.crafting_inv = blockEntity.unsetHandler();
+        this.crafting_inv = blockEntity.unbindCraftingInventory();
         PlayerInventory playerInventory = player.inventory;
         if (!playerInventory.getCursorStack().isEmpty()) {
             player.dropItem(playerInventory.getCursorStack(), false);
@@ -128,23 +129,28 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
         }
     }
 
-   public void populateRecipeFinder(RecipeFinder finder) {
-      this.crafting_inv.provideRecipeInputs(finder);
-   }
+    @Override
+    public void populateRecipeFinder(RecipeFinder finder) {
+        this.crafting_inv.provideRecipeInputs(finder);
+    }
 
-   public void clearCraftingSlots() {
-      this.crafting_inv.clear();
-   }
+    @Override
+    public void clearCraftingSlots() {
+        this.crafting_inv.clear();
+    }
 
-   public boolean matches(Recipe<? super CraftingInventory> recipe) {
-      return recipe.matches(this.crafting_inv, this.player.world);
-   }
+    @Override
+    public boolean matches(Recipe<? super CraftingInventory> recipe) {
+        return recipe.matches(this.crafting_inv, this.player.world);
+    }
 
-   public int getCraftingWidth() {
-      return this.crafting_inv.getWidth();
-   }
+    @Override
+    public int getCraftingWidth() {
+        return this.crafting_inv.getWidth();
+    }
 
-   public int getCraftingHeight() {
-      return this.crafting_inv.getHeight();
-   }
+    @Override
+    public int getCraftingHeight() {
+        return this.crafting_inv.getHeight();
+    }
 }
