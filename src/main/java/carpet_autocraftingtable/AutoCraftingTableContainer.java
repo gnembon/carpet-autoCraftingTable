@@ -1,24 +1,32 @@
 package carpet_autocraftingtable;
 
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
-import net.minecraft.screen.CraftingScreenHandler;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeUnlocker;
+import net.minecraft.screen.CraftingScreenHandler;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class AutoCraftingTableContainer extends CraftingScreenHandler {
     private final CraftingTableBlockEntity blockEntity;
     private final PlayerEntity player;
+    private CraftingInventory crafting_inv;
 
     AutoCraftingTableContainer(int id, PlayerInventory playerInventory, CraftingTableBlockEntity blockEntity) {
         super(id, playerInventory);
         this.blockEntity = blockEntity;
         this.player = playerInventory.player;
+
+        this.crafting_inv = blockEntity.boundCraftingInventory(this);
+
         slots.clear();
         this.addSlot(new OutputSlot(this.blockEntity, this.player));
 
@@ -43,6 +51,7 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
     public void onContentChanged(Inventory inv) {
         if (this.player instanceof ServerPlayerEntity) {
             ServerPlayNetworkHandler netHandler = ((ServerPlayerEntity) this.player).networkHandler;
+            netHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(this.syncId, 0, this.blockEntity.getStack(1)));
             netHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(this.syncId, 0, this.blockEntity.getStack(0)));
         }
     }
@@ -72,6 +81,7 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
     }
 
     public void close(PlayerEntity player) {
+        this.crafting_inv = blockEntity.unbindCraftingInventory();
         PlayerInventory playerInventory = player.inventory;
         if (!playerInventory.getCursorStack().isEmpty()) {
             player.dropItem(playerInventory.getCursorStack(), false);
@@ -119,8 +129,33 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
         }
     }
 
-   @Override
-   public boolean canUse(PlayerEntity player) {
-      return this.blockEntity.canPlayerUse(player);
-   }
+    @Override
+    public void populateRecipeFinder(RecipeFinder finder) {
+        this.crafting_inv.provideRecipeInputs(finder);
+    }
+
+    @Override
+    public void clearCraftingSlots() {
+        this.crafting_inv.clear();
+    }
+
+    @Override
+    public boolean matches(Recipe<? super CraftingInventory> recipe) {
+        return recipe.matches(this.crafting_inv, this.player.world);
+    }
+
+    @Override
+    public int getCraftingWidth() {
+        return this.crafting_inv.getWidth();
+    }
+
+    @Override
+    public int getCraftingHeight() {
+        return this.crafting_inv.getHeight();
+    }
+
+    @Override
+    public boolean canUse(PlayerEntity player) {
+       return this.blockEntity.canPlayerUse(player);
+    }
 }

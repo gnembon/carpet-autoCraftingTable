@@ -43,12 +43,11 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     public ItemStack output = ItemStack.EMPTY;
     private Recipe<?> lastRecipe;
     private List<AutoCraftingTableContainer> openContainers = new ArrayList<>();
+    private CraftingInventory craftingInventory = new CraftingInventory(null, 3, 3);
 
     public CraftingTableBlockEntity() {  //this(BlockEntityType.BARREL);
         this(TYPE);
     }
-
-    private CraftingInventory craftingInventory = new CraftingInventory(null, 3, 3);
 
     private CraftingTableBlockEntity(BlockEntityType<?> type) {
         super(type);
@@ -57,6 +56,22 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     }
 
     public static void init() { } // registers BE type
+
+    public CraftingInventory boundCraftingInventory(ScreenHandler handler) {
+        /**
+         * Binds screen handler to crafting infterface and returns
+         * the crafting interface
+         */
+        ((CraftingInventoryMixin) craftingInventory).setHandler(handler);
+        return craftingInventory;
+    }
+
+    public void unbindCraftingInventory() {
+        /**
+         * Unbinds the crafting inventory from curret screen handler
+         */
+        ((CraftingInventoryMixin) craftingInventory).setHandler(null);
+    }
 
     @Override
     public CompoundTag toTag(CompoundTag tag) {
