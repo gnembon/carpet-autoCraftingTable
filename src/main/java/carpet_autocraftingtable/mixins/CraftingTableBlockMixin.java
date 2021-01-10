@@ -38,7 +38,7 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state)
     {
-        return AutoCraftingTableSettings.autoCraftingTable ? new CraftingTableBlockEntity(pos, state) : null;
+        return (AutoCraftingTableSettings.autoCraftingTable && state.isOf(Blocks.CRAFTING_TABLE) ? new CraftingTableBlockEntity(pos, state) : null;
     }
 
     @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
