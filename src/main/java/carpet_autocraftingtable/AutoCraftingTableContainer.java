@@ -153,4 +153,9 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
     public int getCraftingHeight() {
         return this.crafting_inv.getHeight();
     }
+
+    @Override
+    public boolean canUse(PlayerEntity player) {
+       return this.blockEntity.canPlayerUse(player);
+    }
 }
