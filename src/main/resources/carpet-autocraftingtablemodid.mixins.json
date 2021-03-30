@@ -8,8 +8,6 @@
     "CraftingTableBlockMixin",
     "AbstractBlockMixin"
   ],
-  "client": [
-  ],
   "injectors": {
     "defaultRequire": 1
   }
