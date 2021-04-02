@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "carpet-autocraftingtable",
-  "version": "${version}",
+  "version": "1.4.17",
 
   "name": "Carpet-AutoCraftingTable",
   "description": "Auto-Crafting Table mod for carpet-mod, originally by Skyrising",
