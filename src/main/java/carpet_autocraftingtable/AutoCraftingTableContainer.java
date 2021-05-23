@@ -65,17 +65,17 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
                     return ItemStack.EMPTY;
                 }
             }
-            slots.get(0).onStackChanged(current, before); // calls onCrafted if different
+            slots.get(0).onQuickTransfer(current, before); // calls onCrafted if different
             return this.blockEntity.getStack(0);
         }
         return super.transferSlot(player, slot);
     }
 
     public void close(PlayerEntity player) {
-        PlayerInventory playerInventory = player.getInventory();
-        if (!playerInventory.getCursorStack().isEmpty()) {
-            player.dropItem(playerInventory.getCursorStack(), false);
-            playerInventory.setCursorStack(ItemStack.EMPTY);
+        ItemStack cursorStack = this.player.currentScreenHandler.getCursorStack();
+        if (!cursorStack.isEmpty()) {
+            player.dropItem(cursorStack, false);
+            this.player.currentScreenHandler.setCursorStack(ItemStack.EMPTY);
         }
         this.blockEntity.onContainerClose(this);
     }
@@ -112,10 +112,10 @@ public class AutoCraftingTableContainer extends CraftingScreenHandler {
         }
 
         @Override
-        public ItemStack onTakeItem(PlayerEntity player, ItemStack stack)
+        public void onTakeItem(PlayerEntity player, ItemStack stack)
         {
             onCrafted(stack, stack.getCount());
-            return super.onTakeItem(player, stack);
+            super.onTakeItem(player, stack);
         }
     }
 }

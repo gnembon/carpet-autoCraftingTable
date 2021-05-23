@@ -11,11 +11,11 @@ import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeFinder;
 import net.minecraft.recipe.RecipeInputProvider;
+import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.screen.ScreenHandler;
@@ -31,8 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CraftingTableBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider
-{
+public class CraftingTableBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider {
     public static final BlockEntityType<CraftingTableBlockEntity> TYPE = Registry.register(
             Registry.BLOCK_ENTITY_TYPE,
             "carpet:crafting_table",
@@ -56,18 +55,18 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     public static void init() { } // registers BE type
 
     @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        super.toTag(tag);
-        Inventories.toTag(tag, inventory);
-        tag.put("Output", output.toTag(new CompoundTag()));
+    public NbtCompound writeNbt(NbtCompound tag) {
+        super.writeNbt(tag);
+        Inventories.writeNbt(tag, inventory);
+        tag.put("Output", output.writeNbt(new NbtCompound()));
         return tag;
     }
 
     @Override
-    public void fromTag(CompoundTag tag) {
-        super.fromTag(tag);
-        Inventories.fromTag(tag, inventory);
-        this.output = ItemStack.fromTag(tag.getCompound("Output"));
+    public void readNbt(NbtCompound tag) {
+        super.readNbt(tag);
+        Inventories.readNbt(tag, inventory);
+        this.output = ItemStack.fromNbt(tag.getCompound("Output"));
     }
 
     @Override
@@ -167,9 +166,9 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     }
 
     @Override
-    public void provideRecipeInputs(RecipeFinder finder) {
+    public void provideRecipeInputs(RecipeMatcher finder) {
         for (ItemStack stack : this.inventory) {
-            finder.addItem(stack);
+            finder.addInput(stack);
         }
     }
 
