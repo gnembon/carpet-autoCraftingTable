@@ -8,13 +8,13 @@ public class AutoCraftingTable implements CarpetExtension
     public static void noop() { }
     static
     {
-        CraftingTableBlockEntity.init();
         CarpetServer.manageExtension(new AutoCraftingTable());
     }
 
     @Override
     public void onGameStarted()
     {
+        CraftingTableBlockEntity.init();
         // let's /carpet handle our few simple settings
         CarpetServer.settingsManager.parseSettingsClass(AutoCraftingTableSettings.class);
     }
