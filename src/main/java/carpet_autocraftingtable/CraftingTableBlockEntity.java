@@ -55,11 +55,10 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     public static void init() { } // registers BE type
 
     @Override
-    public NbtCompound writeNbt(NbtCompound tag) {
+    public void writeNbt(NbtCompound tag) {
         super.writeNbt(tag);
         Inventories.writeNbt(tag, inventory);
         tag.put("Output", output.writeNbt(new NbtCompound()));
-        return tag;
     }
 
     @Override
@@ -210,7 +209,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
             if (!remainingStack.isEmpty()) {
                 if (current.isEmpty()) {
                     inventory.set(i, remainingStack);
-                } else if (ItemStack.areItemsEqualIgnoreDamage(current, remainingStack) && ItemStack.areTagsEqual(current, remainingStack)) {
+                } else if (ItemStack.areItemsEqualIgnoreDamage(current, remainingStack) && ItemStack.areEqual(current, remainingStack)) {
                     current.increment(remainingStack.getCount());
                 } else {
                     ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), remainingStack);
