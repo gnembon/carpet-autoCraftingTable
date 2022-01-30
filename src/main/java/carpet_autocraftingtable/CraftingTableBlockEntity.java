@@ -188,7 +188,13 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     private Optional<CraftingRecipe> getCurrentRecipe() {
         if (this.world == null) return Optional.empty();
-        Optional<CraftingRecipe> optionalRecipe = this.world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+        Optional<CraftingRecipe> optionalRecipe;
+        if ((optionalRecipe = Optional.ofNullable((CraftingRecipe) getLastRecipe())).isPresent()) {
+            if (RecipeType.CRAFTING.match(optionalRecipe.get(), world, craftingInventory).isPresent()) {
+                return optionalRecipe;
+            }
+        }
+        optionalRecipe = this.world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
         optionalRecipe.ifPresent(this::setLastRecipe);
         return optionalRecipe;
     }
