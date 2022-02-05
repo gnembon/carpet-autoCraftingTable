@@ -97,11 +97,6 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
-        return this.blockEntity.canPlayerUse(player);
-    }
-
-    @Override
     public ItemStack transferSlot(PlayerEntity player, int slot) {
         if (slot == 0) {
             ItemStack before = this.blockEntity.getStack(0).copy();
