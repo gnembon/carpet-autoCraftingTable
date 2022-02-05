@@ -103,7 +103,6 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
             ItemStack current = before.copy();
             if (!this.insertItem(current, 10, 46, true)) return ItemStack.EMPTY;
             this.blockEntity.removeStack(0, before.getCount() - current.getCount());
-
             if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null) { // this sets recipe in container
                 if (!blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe())) {
                     return ItemStack.EMPTY;
