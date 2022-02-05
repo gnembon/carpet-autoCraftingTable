@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static net.minecraft.util.math.Direction.DOWN;
+
 public class CraftingTableBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider {
     public static final BlockEntityType<CraftingTableBlockEntity> TYPE = Registry.register(
             Registry.BLOCK_ENTITY_TYPE,
@@ -82,8 +84,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     public int[] getAvailableSlots(Direction dir) {
-        if (dir == Direction.DOWN && (!output.isEmpty() || getCurrentRecipe().isPresent())) return OUTPUT_SLOTS;
-        return INPUT_SLOTS;
+        return (dir == DOWN && (!output.isEmpty() || getCurrentRecipe().isPresent())) ? OUTPUT_SLOTS : INPUT_SLOTS;
     }
 
     @Override
@@ -93,8 +94,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        if (slot == 0) return !output.isEmpty() || getCurrentRecipe().isPresent();
-        return true;
+        return slot != 0 || !output.isEmpty() || getCurrentRecipe().isPresent();
     }
 
     @Override
@@ -126,9 +126,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     @Override
     public ItemStack removeStack(int slot, int amount) {
         if (slot == 0) {
-            if (output.isEmpty()) {
-                output = craft();
-            }
+            if (output.isEmpty()) output = craft();
             return output.split(amount);
         }
         return Inventories.splitStack(this.inventory, slot - 1, amount);
@@ -146,11 +144,8 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     public void setStack(int slot, ItemStack stack) {
-        if (slot == 0) {
-            output = stack;
-            return;
-        }
-        inventory.set(slot - 1, stack);
+        if (slot == 0) output = stack;
+        else inventory.set(slot - 1, stack);
     }
 
     @Override
@@ -166,9 +161,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     public void provideRecipeInputs(RecipeMatcher finder) {
-        for (ItemStack stack : this.inventory) {
-            finder.addInput(stack);
-        }
+        for (ItemStack stack : this.inventory) finder.addInput(stack);
     }
 
     @Override
@@ -203,9 +196,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
         for (int i = 0; i < 9; i++) {
             ItemStack current = inventory.get(i);
             ItemStack remainingStack = remaining.get(i);
-            if (!current.isEmpty()) {
-                current.decrement(1);
-            }
+            if (!current.isEmpty()) current.decrement(1);
             if (!remainingStack.isEmpty()) {
                 if (current.isEmpty()) {
                     inventory.set(i, remainingStack);

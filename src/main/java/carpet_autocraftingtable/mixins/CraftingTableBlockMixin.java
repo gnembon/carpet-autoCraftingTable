@@ -26,22 +26,15 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state)
-    {
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
         return (AutoCraftingTableSettings.autoCraftingTable && state.isOf(Blocks.CRAFTING_TABLE)) ? new CraftingTableBlockEntity(pos, state) : null;
     }
 
     @Inject(method = "createScreenHandlerFactory", at = @At("HEAD"), cancellable = true)
-    private void onCreateScreenHandler(BlockState state, World world, BlockPos pos, CallbackInfoReturnable<NamedScreenHandlerFactory> cir)
-    {
-        if (!AutoCraftingTableSettings.autoCraftingTable) return;
-        if (!state.hasBlockEntity()) return;
-        if (!world.isClient) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof CraftingTableBlockEntity) {
-                cir.setReturnValue((NamedScreenHandlerFactory) blockEntity);
-            }
-        }
+    private void onCreateScreenHandler(BlockState state, World world, BlockPos pos, CallbackInfoReturnable<NamedScreenHandlerFactory> cir) {
+        if (!AutoCraftingTableSettings.autoCraftingTable || !state.hasBlockEntity() || world.isClient) return;
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity instanceof CraftingTableBlockEntity) cir.setReturnValue((NamedScreenHandlerFactory) blockEntity);
     }
 
     @Override
@@ -51,11 +44,9 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
 
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        if (!AutoCraftingTableSettings.autoCraftingTable) return 0;
-        if (!state.hasBlockEntity()) return 0;
+        if (!AutoCraftingTableSettings.autoCraftingTable || !state.hasBlockEntity()) return 0;
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof CraftingTableBlockEntity) {
-            CraftingTableBlockEntity craftingTableBlockEntity = (CraftingTableBlockEntity) blockEntity;
+        if (blockEntity instanceof CraftingTableBlockEntity craftingTableBlockEntity) {
             int filled = 0;
             for (ItemStack stack : craftingTableBlockEntity.inventory) {
                 if (!stack.isEmpty()) filled++;
@@ -70,8 +61,7 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
     public void onStateReplaced(BlockState oldState, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (oldState.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof CraftingTableBlockEntity) {
-                CraftingTableBlockEntity craftingTableBlockEntity = ((CraftingTableBlockEntity)blockEntity);
+            if (blockEntity instanceof CraftingTableBlockEntity craftingTableBlockEntity) {
                 ItemScatterer.spawn(world, pos, craftingTableBlockEntity.inventory);
                 if (!craftingTableBlockEntity.output.isEmpty()) {
                     ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), craftingTableBlockEntity.output);
@@ -79,7 +69,6 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
                 world.updateNeighborsAlways(pos, this);
             }
             world.removeBlockEntity(pos);
-
             super.onStateReplaced(oldState, world, pos, newState, moved);
         }
     }
@@ -87,8 +76,7 @@ public class CraftingTableBlockMixin extends Block implements BlockEntityProvide
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof CraftingTableBlockEntity) {
-            CraftingTableBlockEntity craftingTableBlockEntity = ((CraftingTableBlockEntity) blockEntity);
+        if (blockEntity instanceof CraftingTableBlockEntity craftingTableBlockEntity) {
             ItemScatterer.spawn(world, pos, craftingTableBlockEntity.inventory);
             if (!craftingTableBlockEntity.output.isEmpty()) {
                 ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), craftingTableBlockEntity.output);

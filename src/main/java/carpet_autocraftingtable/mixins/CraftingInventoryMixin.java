@@ -8,8 +8,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(CraftingInventory.class)
-public interface CraftingInventoryMixin
-{
+public interface CraftingInventoryMixin {
     @Mutable
     @Accessor("stacks")
     void setInventory(DefaultedList<ItemStack> inventory);

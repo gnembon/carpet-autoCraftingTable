@@ -6,14 +6,12 @@ import carpet.CarpetServer;
 public class AutoCraftingTable implements CarpetExtension
 {
     public static void noop() { }
-    static
-    {
+    static {
         CarpetServer.manageExtension(new AutoCraftingTable());
     }
 
     @Override
-    public void onGameStarted()
-    {
+    public void onGameStarted() {
         CraftingTableBlockEntity.init();
         // let's /carpet handle our few simple settings
         CarpetServer.settingsManager.parseSettingsClass(AutoCraftingTableSettings.class);

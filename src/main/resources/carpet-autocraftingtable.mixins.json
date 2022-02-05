@@ -5,8 +5,7 @@
   "mixins": [
     "CrashReport_noopMixin",
     "CraftingInventoryMixin",
-    "CraftingTableBlockMixin",
-    "AbstractBlockMixin"
+    "CraftingTableBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
