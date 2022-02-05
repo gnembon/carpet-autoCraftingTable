@@ -159,4 +159,9 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
             super.onTakeItem(player, stack);
         }
     }
+
+   @Override
+   public boolean canUse(PlayerEntity player) {
+      return this.blockEntity.canPlayerUse(player);
+   }
 }
