@@ -144,8 +144,12 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     public void setStack(int slot, ItemStack stack) {
-        if (slot == 0) output = stack;
-        else inventory.set(slot - 1, stack);
+        if (slot == 0) {
+            output = stack;
+            return;
+        }
+        inventory.set(slot - 1, stack);
+        markDirty();
     }
 
     @Override
