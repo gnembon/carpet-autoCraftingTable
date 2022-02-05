@@ -99,7 +99,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     public boolean isValid(int slot, ItemStack stack) {
-        return slot != 0;
+        return slot != 0 && slot <= size();
     }
 
     @Override
