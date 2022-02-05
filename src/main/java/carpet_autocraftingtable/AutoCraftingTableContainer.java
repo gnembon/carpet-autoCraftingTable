@@ -27,13 +27,8 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
         this.addSlot(new OutputSlot(this.blockEntity, this.player));
 
         for(int y = 0; y < 3; ++y) {
-            for(int x = 0; x < 3; ++x) {
-                this.addSlot(new Slot(this.blockEntity, x + y * 3 + 1, 30 + x * 18, 17 + y * 18));
-            }
-        }
-
-        for(int y = 0; y < 3; ++y) {
             for(int x = 0; x < 9; ++x) {
+                if (x < 3) this.addSlot(new Slot(this.blockEntity, x + y * 3 + 1, 30 + x * 18, 17 + y * 18));
                 this.addSlot(new Slot(playerInventory, x + y * 9 + 9, 8 + x * 18, 84 + y * 18));
             }
         }
@@ -111,16 +106,11 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
         if (slot == 0) {
             ItemStack before = this.blockEntity.getStack(0).copy();
             ItemStack current = before.copy();
-            if (!this.insertItem(current, 10, 46, true)) {
-                return ItemStack.EMPTY;
-            }
+            if (!this.insertItem(current, 10, 46, true)) return ItemStack.EMPTY;
             this.blockEntity.removeStack(0, before.getCount() - current.getCount());
 
-            if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null)
-            {
-                // this sets recipe in container
-                if (!blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe()))
-                {
+            if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null) { // this sets recipe in container
+                if (!blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe())) {
                     return ItemStack.EMPTY;
                 }
             }
@@ -140,7 +130,7 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
     }
 
     private class OutputSlot extends Slot {
-        private PlayerEntity player;
+        private final PlayerEntity player;
         OutputSlot(Inventory inv, PlayerEntity player) {
             super(inv, 0, 124, 35);
             this.player = player;
@@ -157,22 +147,14 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
         }
 
         @Override
-        protected void onCrafted(ItemStack stack, int amount)
-        {
-            super.onCrafted(stack);
-            // from CraftingResultsSlot onCrafted
-            if (amount > 0) {
-                stack.onCraft(this.player.world, this.player, amount);
-            }
-
-            if (this.inventory instanceof RecipeUnlocker) {
-                ((RecipeUnlocker)this.inventory).unlockLastRecipe(this.player);
-            }
+        protected void onCrafted(ItemStack stack, int amount) {
+            super.onCrafted(stack); // from CraftingResultsSlot onCrafted
+            if (amount > 0) stack.onCraft(this.player.world, this.player, amount);
+            if (this.inventory instanceof RecipeUnlocker) ((RecipeUnlocker)this.inventory).unlockLastRecipe(this.player);
         }
 
         @Override
-        public void onTakeItem(PlayerEntity player, ItemStack stack)
-        {
+        public void onTakeItem(PlayerEntity player, ItemStack stack) {
             onCrafted(stack, stack.getCount());
             super.onTakeItem(player, stack);
         }
