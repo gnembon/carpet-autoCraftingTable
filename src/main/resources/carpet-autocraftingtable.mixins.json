@@ -3,9 +3,10 @@
   "package": "carpet_autocraftingtable.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "CrashReport_noopMixin",
+    "BootStrapMixin",
     "CraftingInventoryMixin",
-    "CraftingTableBlockMixin"
+    "CraftingTableBlockMixin",
+    "CrashReport_noopMixin"
   ],
   "injectors": {
     "defaultRequire": 1

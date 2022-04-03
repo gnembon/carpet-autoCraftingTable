@@ -160,7 +160,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     public boolean canPlayerUse(PlayerEntity player) {
-        return player.getBlockPos().getSquaredDistance(this.pos,false) <= 64.0D;
+        return player.getBlockPos().getSquaredDistance(this.pos) <= 64.0D;
     }
 
     @Override
@@ -199,7 +199,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     private ItemStack craft() {
         if (this.world == null) return ItemStack.EMPTY;
         Optional<CraftingRecipe> optionalRecipe = getCurrentRecipe();
-        if (!optionalRecipe.isPresent()) return ItemStack.EMPTY;
+        if (optionalRecipe.isEmpty()) return ItemStack.EMPTY;
         CraftingRecipe recipe = optionalRecipe.get();
         ItemStack result = recipe.craft(craftingInventory);
         DefaultedList<ItemStack> remaining = world.getRecipeManager().getRemainingStacks(RecipeType.CRAFTING, craftingInventory, world);
