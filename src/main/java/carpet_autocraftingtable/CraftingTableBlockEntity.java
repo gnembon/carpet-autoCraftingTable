@@ -184,7 +184,8 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     }
 
     private Optional<CraftingRecipe> getCurrentRecipe() {
-        if (this.world == null) return Optional.empty();
+        // No need to find recipes if the inventory is empty. Cannot craft anything.
+        if (this.world == null || this.isEmpty()) return Optional.empty();
         Optional<CraftingRecipe> optionalRecipe;
         if ((optionalRecipe = Optional.ofNullable((CraftingRecipe) getLastRecipe())).isPresent()) {
             if (RecipeType.CRAFTING.match(optionalRecipe.get(), world, craftingInventory).isPresent()) {
