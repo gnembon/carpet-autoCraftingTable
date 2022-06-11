@@ -101,48 +101,22 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
         }
     }
 
-    /**
-     * Pretty much Ctrl + C and Ctrl + V from vanilla crafting table. except from the slot 0 part.
-     * Before this change it was triggering the infinite loop. in ScreenHandler.internalOnSlotClick() Quick Transfer
-     */
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int slotIndex) {
-        ItemStack itemStack = ItemStack.EMPTY;
-        Slot slot = this.slots.get(slotIndex);
-        if (slot.hasStack()){
-            ItemStack slotStack = slot.getStack();
-            if (slotIndex == 0) {
-                ItemStack before = this.blockEntity.getStack(0).copy();
-                ItemStack current = before.copy();
-                if (!this.insertItem(current, 10, 46, true))
+    public ItemStack transferSlot(PlayerEntity player, int slot) {
+        if (slot == 0) {
+            ItemStack before = this.blockEntity.getStack(0).copy();
+            ItemStack current = before.copy();
+            if (!this.insertItem(current, 10, 46, true)) return ItemStack.EMPTY;
+            this.blockEntity.removeStack(0, before.getCount() - current.getCount());
+            if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null) { // this sets recipe in container
+                if (!blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe())) {
                     return ItemStack.EMPTY;
-                this.blockEntity.removeStack(0, before.getCount() - current.getCount());
-                if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null) { // this sets recipe in container
-                    if (!blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe())) {
-                        return ItemStack.EMPTY;
-                    }
                 }
-                slots.get(0).onQuickTransfer(current, before); // calls onCrafted if different
-            } else if (slotIndex >= 10 && slotIndex < 46
-                ? !this.insertItem(slotStack, 1, 10, false)
-                    && (slotIndex < 37
-                        ? !this.insertItem(slotStack, 37, 46, false)
-                        : !this.insertItem(slotStack, 10, 37, false))
-                : !this.insertItem(slotStack, 10, 46, false)
-            ) {
-                return ItemStack.EMPTY;
             }
-            if (slotStack.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
-            } else {
-                slot.markDirty();
-            }
-            if (slotStack.getCount() == itemStack.getCount()) {
-                return ItemStack.EMPTY;
-            }
-            slot.onTakeItem(player, slotStack);
+            slots.get(0).onQuickTransfer(current, before); // calls onCrafted if different
+            return this.blockEntity.getStack(0);
         }
-        return itemStack;
+        return super.transferSlot(player, slot);
     }
 
     public void close(PlayerEntity player) {
