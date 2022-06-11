@@ -102,21 +102,51 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int slot) {
-        if (slot == 0) {
-            ItemStack before = this.blockEntity.getStack(0).copy();
-            ItemStack current = before.copy();
-            if (!this.insertItem(current, 10, 46, true)) return ItemStack.EMPTY;
-            this.blockEntity.removeStack(0, before.getCount() - current.getCount());
-            if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null) { // this sets recipe in container
-                if (!blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe())) {
-                    return ItemStack.EMPTY;
+    public ItemStack transferSlot(PlayerEntity player, int index) {
+        ItemStack itemStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+        if (slot.hasStack()) {
+            ItemStack itemStack2 = slot.getStack();
+            itemStack = itemStack2.copy();
+            if (index == 0) {
+                ItemStack before = this.blockEntity.getStack(0).copy();
+                ItemStack current = before.copy();
+                if (!this.insertItem(current, 10, 46, true)) return ItemStack.EMPTY;
+                this.blockEntity.removeStack(0, before.getCount() - current.getCount());
+                if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null) { // this sets recipe in container
+                    if (!blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe())) {
+                        return ItemStack.EMPTY;
+                    }
                 }
+                slots.get(0).onQuickTransfer(current, before); // calls onCrafted if different
+                return this.blockEntity.getStack(0);
+            } else if (index >= 10 && index < 46) {
+                if (!this.insertItem(itemStack2, 1, 10, false)) {
+                    if (index < 37) {
+                        if (!this.insertItem(itemStack2, 37, 46, false)) {
+                            return ItemStack.EMPTY;
+                        }
+                    } else if (!this.insertItem(itemStack2, 10, 37, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                }
+            } else if (!this.insertItem(itemStack2, 10, 46, false)) {
+                return ItemStack.EMPTY;
             }
-            slots.get(0).onQuickTransfer(current, before); // calls onCrafted if different
-            return this.blockEntity.getStack(0);
+
+            if (itemStack2.isEmpty()) {
+                slot.setStack(ItemStack.EMPTY);
+            } else {
+                slot.markDirty();
+            }
+
+            if (itemStack2.getCount() == itemStack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTakeItem(player, itemStack2);
         }
-        return super.transferSlot(player, slot);
+        return itemStack;
     }
 
     public void close(PlayerEntity player) {
