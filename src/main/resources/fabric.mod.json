@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "carpet-autocraftingtable",
-  "version": "1.4.56",
+  "version": "1.4.57",
 
   "name": "Carpet-AutoCraftingTable",
   "description": "Auto-Crafting Table mod for carpet-mod, originally by Skyrising",
@@ -28,7 +28,7 @@
   ],
   "accessWidener": "act.accesswidener",
   "depends": {
-    "minecraft": "1.18.x",
+    "minecraft": "1.19.x",
     "fabricloader": ">=0.10.0",
     "carpet": "*"
   },

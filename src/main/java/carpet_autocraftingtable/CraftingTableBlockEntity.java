@@ -15,12 +15,12 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.CraftingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeInputProvider;
+import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
@@ -72,7 +72,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     protected Text getContainerName() {
-        return new TranslatableText("container.crafting");
+        return Text.translatable("container.crafting");
     }
 
     @Override
@@ -186,15 +186,19 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     private Optional<CraftingRecipe> getCurrentRecipe() {
         // No need to find recipes if the inventory is empty. Cannot craft anything.
         if (this.world == null || this.isEmpty()) return Optional.empty();
-        Optional<CraftingRecipe> optionalRecipe;
-        if ((optionalRecipe = Optional.ofNullable((CraftingRecipe) getLastRecipe())).isPresent()) {
-            if (RecipeType.CRAFTING.match(optionalRecipe.get(), world, craftingInventory).isPresent()) {
-                return optionalRecipe;
+
+        CraftingRecipe lastRecipe = (CraftingRecipe) getLastRecipe();
+        RecipeManager manager = this.world.getRecipeManager();
+
+        if (lastRecipe != null) {
+            CraftingRecipe mapRecipe = manager.getAllOfType(RecipeType.CRAFTING).get(lastRecipe);
+            if (mapRecipe != null && mapRecipe.matches(craftingInventory, world)) {
+                return Optional.of(lastRecipe);
             }
         }
-        optionalRecipe = this.world.getRecipeManager().getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
-        optionalRecipe.ifPresent(this::setLastRecipe);
-        return optionalRecipe;
+        Optional<CraftingRecipe> recipe = manager.getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+        recipe.ifPresent(this::setLastRecipe);
+        return recipe;
     }
 
     private ItemStack craft() {
