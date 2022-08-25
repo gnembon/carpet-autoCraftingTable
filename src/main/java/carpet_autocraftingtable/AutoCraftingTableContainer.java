@@ -1,18 +1,18 @@
 package carpet_autocraftingtable;
 
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeMatcher;
+import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -102,21 +102,52 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
     }
 
     @Override
-    public ItemStack transferSlot(PlayerEntity player, int slot) {
-        if (slot == 0) {
-            ItemStack before = this.blockEntity.getStack(0).copy();
-            ItemStack current = before.copy();
-            if (!this.insertItem(current, 10, 46, true)) return ItemStack.EMPTY;
-            this.blockEntity.removeStack(0, before.getCount() - current.getCount());
-            if(player instanceof ServerPlayerEntity && blockEntity.getLastRecipe() != null) { // this sets recipe in container
-                if (!blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe())) {
-                    return ItemStack.EMPTY;
+    public ItemStack transferSlot(PlayerEntity player, int index) {
+        ItemStack remainderResultStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+        if (slot.hasStack()) {
+            ItemStack original = slot.getStack();
+            ItemStack resultStack = original.copy();
+            remainderResultStack = resultStack.copy();
+            if (index == 0) {
+                if (!this.insertItem(resultStack, 10, 46, true)) return ItemStack.EMPTY;
+                this.blockEntity.removeStack(index, original.getCount() - resultStack.getCount());
+                // this sets recipe in container
+                if(
+                    player instanceof ServerPlayerEntity
+                    && blockEntity.getLastRecipe() != null
+                    && !blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe())
+                ) {
+                        return ItemStack.EMPTY;
                 }
+                slots.get(0).onQuickTransfer(resultStack, original); // calls onCrafted if different
+            } else if (index >= 10 && index < 46) {
+                if (!this.insertItem(resultStack, 1, 10, false)) {
+                    if (index < 37) {
+                        if (!this.insertItem(resultStack, 37, 46, false)) {
+                            return ItemStack.EMPTY;
+                        }
+                    } else if (!this.insertItem(resultStack, 10, 37, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                }
+            } else if (!this.insertItem(resultStack, 10, 46, false)) {
+                return ItemStack.EMPTY;
             }
-            slots.get(0).onQuickTransfer(current, before); // calls onCrafted if different
-            return this.blockEntity.getStack(0);
+
+            if (resultStack.isEmpty()) {
+                slot.setStack(ItemStack.EMPTY);
+            } else {
+                slot.markDirty();
+            }
+
+            if (resultStack.getCount() == remainderResultStack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTakeItem(player, resultStack);
         }
-        return super.transferSlot(player, slot);
+        return remainderResultStack;
     }
 
     public void close(PlayerEntity player) {
