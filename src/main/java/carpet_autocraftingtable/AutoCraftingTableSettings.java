@@ -1,8 +1,8 @@
 package carpet_autocraftingtable;
 
-import carpet.settings.Rule;
+import carpet.api.settings.Rule;
 
-import static carpet.settings.RuleCategory.CREATIVE;
+import static carpet.api.settings.RuleCategory.CREATIVE;
 
 /**
  * Here is your example Settings class you can plug to use carpetmod /carpet settings command
