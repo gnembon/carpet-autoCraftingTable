@@ -13,7 +13,7 @@ public class BootStrapMixin {
 		method="initialize",
 		at=@At(
 			value = "INVOKE",
-			target = "Lnet/minecraft/util/registry/Registry;freezeRegistries()V",
+			target = "Lnet/minecraft/registry/Registries;bootstrap()V",
 			shift = At.Shift.BEFORE
 		)
 	)

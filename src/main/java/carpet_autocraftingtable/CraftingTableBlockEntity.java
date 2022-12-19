@@ -19,13 +19,14 @@ import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.RecipeUnlocker;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.registry.Registry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +36,9 @@ import static net.minecraft.util.math.Direction.DOWN;
 
 public class CraftingTableBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider {
     public static final BlockEntityType<CraftingTableBlockEntity> TYPE = Registry.register(
-            Registry.BLOCK_ENTITY_TYPE,
-            "carpet:crafting_table",
-            BlockEntityType.Builder.create(CraftingTableBlockEntity::new, Blocks.CRAFTING_TABLE).build(null)
+        Registries.BLOCK_ENTITY_TYPE,
+        "carpet:crafting_table",
+        BlockEntityType.Builder.create(CraftingTableBlockEntity::new, Blocks.CRAFTING_TABLE).build(null)
     );
     private static final int[] OUTPUT_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     private static final int[] INPUT_SLOTS = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -215,7 +216,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
             if (!remainingStack.isEmpty()) {
                 if (current.isEmpty()) {
                     inventory.set(i, remainingStack);
-                } else if (ItemStack.areItemsEqualIgnoreDamage(current, remainingStack) && ItemStack.areEqual(current, remainingStack)) {
+                } else if (ItemStack.canCombine(current, remainingStack)) {
                     current.increment(remainingStack.getCount());
                 } else {
                     ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), remainingStack);
