@@ -10,9 +10,9 @@
     "Gnembon"
   ],
   "contact": {
-    "homepage": "https://github.com/gnembon/carpet-autoCraftingTable",
-    "sources": "https://github.com/gnembon/carpet-autoCraftingTable",
-    "issues": "https://github.com/gnembon/carpet-autoCraftingTable"
+    "homepage": "https://github.com/SirRemus/carpet-autoCraftingTable",
+    "sources": "https://github.com/SirRemus/carpet-autoCraftingTable",
+    "issues": "https://github.com/SirRemus/carpet-autoCraftingTable"
   },
 
   "license": "GNU LGPL V3",
@@ -28,7 +28,7 @@
   ],
   "accessWidener": "act.accesswidener",
   "depends": {
-    "minecraft": "1.19.x",
+    "minecraft": "1.20",
     "fabricloader": ">=0.10.0",
     "carpet": "*"
   },
