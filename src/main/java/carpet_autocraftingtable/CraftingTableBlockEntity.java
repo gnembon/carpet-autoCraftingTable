@@ -23,14 +23,13 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static net.minecraft.util.math.Direction.DOWN;
 
@@ -121,7 +120,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
         if (slot > 0) return this.inventory.get(slot - 1);
         if (!output.isEmpty()) return output;
         Optional<CraftingRecipe> recipe = getCurrentRecipe();
-        return recipe.map(craftingRecipe -> craftingRecipe.craft(craftingInventory, world.getRegistryManager())).orElse(ItemStack.EMPTY);
+        return recipe.map(craftingRecipe -> craftingRecipe.craft(craftingInventory, Objects.requireNonNull(getWorld()).getRegistryManager())).orElse(ItemStack.EMPTY);
     }
 
     @Override
@@ -186,29 +185,36 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     private Optional<CraftingRecipe> getCurrentRecipe() {
         // No need to find recipes if the inventory is empty. Cannot craft anything.
-        if (this.world == null || this.isEmpty()) return Optional.empty();
+        if (this.getWorld() == null || this.isEmpty()) return Optional.empty();
 
         CraftingRecipe lastRecipe = (CraftingRecipe) getLastRecipe();
-        RecipeManager manager = this.world.getRecipeManager();
+        RecipeManager manager = this.getWorld().getRecipeManager();
 
         if (lastRecipe != null) {
-            CraftingRecipe mapRecipe = manager.getAllOfType(RecipeType.CRAFTING).get(lastRecipe);
-            if (mapRecipe != null && mapRecipe.matches(craftingInventory, world)) {
+            Map<Identifier, CraftingRecipe> allRecipes = manager.getAllOfType(RecipeType.CRAFTING);
+            CraftingRecipe mapRecipe = null;
+            for (CraftingRecipe recipe : allRecipes.values()) {
+                if (recipe.equals(lastRecipe)) {
+                    mapRecipe = recipe;
+                    break;
+                }
+            }
+            if (mapRecipe != null && mapRecipe.matches(craftingInventory, getWorld())) {
                 return Optional.of(lastRecipe);
             }
         }
-        Optional<CraftingRecipe> recipe = manager.getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+        Optional<CraftingRecipe> recipe = manager.getFirstMatch(RecipeType.CRAFTING, craftingInventory, getWorld());
         recipe.ifPresent(this::setLastRecipe);
         return recipe;
     }
 
     private ItemStack craft() {
-        if (this.world == null) return ItemStack.EMPTY;
+        if (this.getWorld() == null) return ItemStack.EMPTY;
         Optional<CraftingRecipe> optionalRecipe = getCurrentRecipe();
         if (optionalRecipe.isEmpty()) return ItemStack.EMPTY;
         CraftingRecipe recipe = optionalRecipe.get();
-        ItemStack result = recipe.craft(craftingInventory, world.getRegistryManager());
-        DefaultedList<ItemStack> remaining = world.getRecipeManager().getRemainingStacks(RecipeType.CRAFTING, craftingInventory, world);
+        ItemStack result = recipe.craft(craftingInventory, getWorld().getRegistryManager());
+        DefaultedList<ItemStack> remaining = getWorld().getRecipeManager().getRemainingStacks(RecipeType.CRAFTING, craftingInventory, getWorld());
         for (int i = 0; i < 9; i++) {
             ItemStack current = inventory.get(i);
             ItemStack remainingStack = remaining.get(i);
@@ -219,7 +225,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
                 } else if (ItemStack.canCombine(current, remainingStack)) {
                     current.increment(remainingStack.getCount());
                 } else {
-                    ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), remainingStack);
+                    ItemScatterer.spawn(getWorld(), pos.getX(), pos.getY(), pos.getZ(), remainingStack);
                 }
             }
         }
@@ -232,6 +238,6 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     }
 
     public boolean matches(Recipe<? super CraftingInventory> recipe) {
-        return this.world != null && recipe.matches(this.craftingInventory, this.world);
+        return this.getWorld() != null && recipe.matches(this.craftingInventory, this.getWorld());
     }
 }
