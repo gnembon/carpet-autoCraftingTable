@@ -116,7 +116,7 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
                 if(
                     player instanceof ServerPlayerEntity
                     && blockEntity.getLastRecipe() != null
-                    && !blockEntity.shouldCraftRecipe(player.world, (ServerPlayerEntity) player, blockEntity.getLastRecipe())
+                    && !blockEntity.shouldCraftRecipe(player.getWorld(), (ServerPlayerEntity) player, blockEntity.getLastRecipe())
                 ) {
                         return ItemStack.EMPTY;
                 }
@@ -179,8 +179,8 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
         @Override
         protected void onCrafted(ItemStack stack, int amount) {
             super.onCrafted(stack); // from CraftingResultsSlot onCrafted
-            if (amount > 0) stack.onCraft(this.player.world, this.player, amount);
-            if (this.inventory instanceof RecipeUnlocker) ((RecipeUnlocker)this.inventory).unlockLastRecipe(this.player);
+            if (amount > 0) stack.onCraft(this.player.getWorld(), this.player, amount);
+            if (this.inventory instanceof RecipeUnlocker) ((RecipeUnlocker)this.inventory).unlockLastRecipe(this.player, getStacks());
         }
 
         @Override

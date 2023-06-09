@@ -28,7 +28,7 @@
   ],
   "accessWidener": "act.accesswidener",
   "depends": {
-    "minecraft": "1.19.x",
+    "minecraft": ">=1.20",
     "fabricloader": ">=0.10.0",
     "carpet": "*"
   },
