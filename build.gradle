@@ -8,6 +8,9 @@ repositories {
 	maven {
 		url 'https://masa.dy.fi/maven'
 	}
+	maven {
+		url 'https://maven.nucleoid.xyz'
+	}
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -28,6 +31,8 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "carpet:fabric-carpet:${project.minecraft_version}-${project.carpet_core_version}"
+
+	modImplementation include("eu.pb4:polymer-reg-sync-manipulator:0.5.7+1.20.1")
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
