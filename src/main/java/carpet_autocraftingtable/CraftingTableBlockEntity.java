@@ -1,6 +1,7 @@
 package carpet_autocraftingtable;
 
 import carpet_autocraftingtable.mixins.CraftingInventoryMixin;
+import eu.pb4.polymer.rsm.api.RegistrySyncUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
@@ -55,7 +56,10 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     private final CraftingInventory craftingInventory = new CraftingInventory(null, 3, 3);
 
-    public static void init() { } // registers BE type
+    public static void init() { // registers BE type
+        // Mark as server-only registry entry
+        RegistrySyncUtils.setServerEntry(Registries.BLOCK_ENTITY_TYPE, TYPE);
+    }
 
     @Override
     public void writeNbt(NbtCompound tag) {
