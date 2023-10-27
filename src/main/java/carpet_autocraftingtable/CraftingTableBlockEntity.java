@@ -12,13 +12,7 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.CraftingRecipe;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeInputProvider;
-import net.minecraft.recipe.RecipeManager;
-import net.minecraft.recipe.RecipeMatcher;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.recipe.RecipeUnlocker;
+import net.minecraft.recipe.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.screen.ScreenHandler;
@@ -32,22 +26,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static net.minecraft.util.math.Direction.DOWN;
-
 public class CraftingTableBlockEntity extends LockableContainerBlockEntity implements SidedInventory, RecipeUnlocker, RecipeInputProvider {
     public static final BlockEntityType<CraftingTableBlockEntity> TYPE = Registry.register(
-        Registries.BLOCK_ENTITY_TYPE,
-        "carpet:crafting_table",
-        BlockEntityType.Builder.create(CraftingTableBlockEntity::new, Blocks.CRAFTING_TABLE).build(null)
+            Registries.BLOCK_ENTITY_TYPE,
+            "carpet:crafting_table",
+            BlockEntityType.Builder.create(CraftingTableBlockEntity::new, Blocks.CRAFTING_TABLE).build(null)
     );
     private static final int[] OUTPUT_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     private static final int[] INPUT_SLOTS = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     public DefaultedList<ItemStack> inventory;
     public ItemStack output = ItemStack.EMPTY;
-    private Recipe<?> lastRecipe;
+    private RecipeEntry<?> lastRecipe;  // Changed type to RecipeEntry<?>
     private final List<AutoCraftingTableContainer> openContainers = new ArrayList<>();
 
-    public CraftingTableBlockEntity(BlockPos pos, BlockState state) {  //this(BlockEntityType.BARREL);
+    public CraftingTableBlockEntity(BlockPos pos, BlockState state) {
         super(TYPE, pos, state);
         this.inventory = DefaultedList.ofSize(9, ItemStack.EMPTY);
         ((CraftingInventoryMixin) craftingInventory).setInventory(this.inventory);
@@ -55,7 +47,8 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     private final CraftingInventory craftingInventory = new CraftingInventory(null, 3, 3);
 
-    public static void init() { } // registers BE type
+    public static void init() {
+    }
 
     @Override
     public void writeNbt(NbtCompound tag) {
@@ -85,7 +78,7 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
 
     @Override
     public int[] getAvailableSlots(Direction dir) {
-        return (dir == DOWN && (!output.isEmpty() || getCurrentRecipe().isPresent())) ? OUTPUT_SLOTS : INPUT_SLOTS;
+        return (dir == Direction.DOWN && (!output.isEmpty() || getCurrentRecipe().isPresent())) ? OUTPUT_SLOTS : INPUT_SLOTS;
     }
 
     @Override
@@ -170,12 +163,12 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     }
 
     @Override
-    public void setLastRecipe(Recipe<?> recipe) {
-        lastRecipe = recipe;
+    public void setLastRecipe(RecipeEntry<?> recipeEntry) {
+        this.lastRecipe = recipeEntry;
     }
 
     @Override
-    public Recipe<?> getLastRecipe() {
+    public RecipeEntry<?> getLastRecipe() {
         return lastRecipe;
     }
 
@@ -185,21 +178,11 @@ public class CraftingTableBlockEntity extends LockableContainerBlockEntity imple
     }
 
     private Optional<CraftingRecipe> getCurrentRecipe() {
-        // No need to find recipes if the inventory is empty. Cannot craft anything.
         if (this.world == null || this.isEmpty()) return Optional.empty();
-
-        CraftingRecipe lastRecipe = (CraftingRecipe) getLastRecipe();
         RecipeManager manager = this.world.getRecipeManager();
-
-        if (lastRecipe != null) {
-            CraftingRecipe mapRecipe = manager.getAllOfType(RecipeType.CRAFTING).get(lastRecipe);
-            if (mapRecipe != null && mapRecipe.matches(craftingInventory, world)) {
-                return Optional.of(lastRecipe);
-            }
-        }
-        Optional<CraftingRecipe> recipe = manager.getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
+        Optional<RecipeEntry<CraftingRecipe>> recipe = manager.getFirstMatch(RecipeType.CRAFTING, craftingInventory, world);
         recipe.ifPresent(this::setLastRecipe);
-        return recipe;
+        return recipe.map(RecipeEntry::value);
     }
 
     private ItemStack craft() {
