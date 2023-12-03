@@ -7,6 +7,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.RecipeMatcher;
 import net.minecraft.recipe.RecipeUnlocker;
 import net.minecraft.recipe.book.RecipeBookCategory;
@@ -59,8 +60,8 @@ public class AutoCraftingTableContainer extends AbstractRecipeScreenHandler<Craf
     }
 
     @Override
-    public boolean matches(Recipe<? super CraftingInventory> recipe) {
-        return this.blockEntity.matches(recipe);
+    public boolean matches(RecipeEntry<? extends Recipe<CraftingInventory>> recipe) {
+        return this.blockEntity.matches(recipe.value());
     }
 
     @Override
